@@ -6,16 +6,17 @@ open Printf;;
                                   Définition des types
     ---------------------------------------------------------------------------------- *)
 type color = 
-  |  Red 
+  | Red 
   | Green
   | Blue
   | Yellow
   | Orange
   | Purple
-  | Grey 
   | Brown
   | Pink
-  | Cyan;;
+  | Cyan
+  | Grey 
+;;
 
 let string_of_color c = 
   match c with
@@ -25,23 +26,25 @@ let string_of_color c =
   | Yellow -> "Yellow"
   | Orange -> "Orange"
   | Purple -> "Purple"
-  | Grey -> "Grey"
   | Brown -> "Brown"
   | Pink -> "Pink"
-  | Cyan -> "Cyan";;
+  | Cyan -> "Cyan"
+  | Grey -> "Grey"
+;;
 
-let color_to_rgb color = 
-  match color with
+let color_to_rgb c = 
+  match c with
   | Red -> "255,0,0"
   | Green -> "0,255,0"
   | Blue -> "0,0,255"
   | Yellow -> "255,255,0"
   | Orange -> "255,165,0"
   | Purple -> "128,0,128"
-  | Grey -> "128,128,128"
   | Brown -> "165,42,42"
   | Pink -> "255,192,203"
-  | Cyan -> "0,255,255";;
+  | Cyan -> "0,255,255"
+  | Grey -> "128,128,128"
+;;
 
 (* ----------------------------------------------------------------------------------
                                   Création des pièces
@@ -64,6 +67,12 @@ let create_piece c1 c2 c3 c4 : piece =
   let piece = { id = !piece_counter; edge_colors = [c1; c2; c3; c4];} in
   piece_counter := !piece_counter + 1;
   piece;;
+
+let create_corner_piece c1 c2: piece = 
+  create_piece c1 c2 Grey Grey;;
+
+let create_edge_piece c1 c2 c3: piece =
+  create_piece c1 c2 c3 Grey;;
 
 
 (* Méthode pour afficher une pièce format SVG*)
@@ -101,9 +110,13 @@ let create_board n m : board =
   Array.make_matrix n m None;;
  
 (* Nombre de coins : 4
-   Nombre de bord : 4 * (n - 2) 
-   Nombre de pièce intérieurs : (n - 2) * (n - 2) 
+   Nombre de bord :  2(m + n − 4)
+   Nombre de pièce intérieurs : (n - 2) * (m - 2)
 *)
+
+(* Remplir le plateau avec le bon nombre de piece *)
+
+
 
 
 
@@ -174,9 +187,10 @@ let is_flip_horizontal_valid piece1 piece2 : bool =
     ---------------------------------------------------------------------------------- *)
     
 
-(* let piece2 = rotate_piece piece1 1;; *)
 (* let piece2 = flip_vertical piece1;; *)
 (* let piece2 = flip_horizontal piece1;; *)
+let piece1 = create_piece Red Green Blue Yellow;;
+let piece2 = rotate_piece piece1 1;;
 print_piece piece1;;
 print_piece piece2;;
 create_piece_svg piece1;;
