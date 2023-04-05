@@ -48,7 +48,7 @@ let random_color () = colors.(Random.int (Array.length colors));;
 Printf.printf "%s " (string_of_color (random_color ()));;
 
 
-let last_piece_id = ref 1 
+let last_piece_id = ref 0 
 let next_piece_id () = 
   last_piece_id := !last_piece_id + 1;
   !last_piece_id;;
@@ -87,7 +87,11 @@ let create_piece type_piece : piece =
     {id = id; rots = rots; cell = None;}
     | _ -> failwith "Invalid piece type";;
 
-
+let print_piece piece = 
+  Printf.printf "ID : %d\n" piece.id;
+  for i = 0 to 3 do
+    Printf.printf "Top : %s, Right : %s, Bottom : %s, Left : %s\n" (string_of_color piece.rots.(i).top) (string_of_color piece.rots.(i).right) (string_of_color piece.rots.(i).bottom) (string_of_color piece.rots.(i).left);
+  done;;
 
 (* Fonction pour faire pivoter une structure sides de n rotations *)
 let rotate s rot =
@@ -101,4 +105,11 @@ let rotate s rot =
   done;
   ret;;
 
-  
+let piece = create_piece "corner";;
+let piece2 = create_piece "edge";;
+let piece3 = create_piece "inside";;
+print_piece piece;;
+print_piece piece2;;
+print_piece piece3;;
+
+(* Fonction pour créer un plateau de taille width * height *)
