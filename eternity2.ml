@@ -105,11 +105,74 @@ let rotate s rot =
   done;
   ret;;
 
-let piece = create_piece "corner";;
+(* let piece = create_piece "corner";;
 let piece2 = create_piece "edge";;
 let piece3 = create_piece "inside";;
 print_piece piece;;
 print_piece piece2;;
-print_piece piece3;;
+print_piece piece3;; *)
 
 (* Fonction pour créer un plateau de taille width * height *)
+let create_board m n = 
+  let nb_corner = 4 in 
+  let nb_edge = 2 * (m + n - 4) in
+
+  let pieces = Array.init (n * m) (fun i -> 
+    let type_piece = 
+      if i < nb_corner then 
+        "corner"
+      else if i < nb_corner + nb_edge then 
+        "edge"
+      else 
+        "inside" 
+      in
+    create_piece type_piece
+    ) in
+    pieces;;
+
+  let piece_to_svg piece = 
+    let color_to_hex c = hex_of_color c in
+    let side_to_polygon side =
+      match side with
+      | "top" -> Printf.sprintf "<polygon points=\"0,0 50,50 0,100\" fill=\"%s\" />" (color_to_hex piece.rots.(0).top)
+      | "right" -> Printf.sprintf "<polygon points=\"0,0 50,50 100,0\" fill=\"%s\" />" (color_to_hex piece.rots.(0).right)
+      | "bottom" -> Printf.sprintf "<polygon points=\"100,0 50,50 100,100\" fill=\"%s\" />" (color_to_hex piece.rots.(0).bottom)
+      | "left" -> Printf.sprintf "<polygon points=\"0,100 50,50 100,100\" fill=\"%s\" />" (color_to_hex piece.rots.(0).left)
+      | _ -> failwith "Invalid side"
+    in
+  
+    let top = side_to_polygon "top" in
+    let right = side_to_polygon "right" in
+    let bottom = side_to_polygon "bottom" in
+    let left = side_to_polygon "left" in
+  
+    Printf.sprintf "<g id=\"piece-%d\">\n%s\n%s\n%s\n%s\n</g>" piece.id top right bottom left
+  ;;
+
+(* Fonction pour créer un fichier SVG contenant les pièces *)
+let pieces_to_svg pieces width height filename =
+  let header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">" in
+  let footer = "</svg>" in
+  let piece_width = 100 in
+  let piece_height = 100 in
+
+  let body = Array.mapi (fun i piece ->
+    let x = (i mod width) * piece_width in
+    let y = (i / width) * piece_height in
+    let piece_svg = piece_to_svg piece in
+    Printf.sprintf "<g id=\"piece-%d\" transform=\"translate(%d, %d)\">%s</g>"
+      piece.id x y piece_svg
+  ) pieces in
+
+  let svg = header ^ (String.concat "\n" (Array.to_list body)) ^ footer in
+  let oc = open_out filename in
+  output_string oc svg;
+  close_out oc
+;;
+
+let board = create_board 4 4;;
+Array.iter print_piece board;;
+pieces_to_svg board 4 4 "puzzle_pieces.svg";
+
+
+
