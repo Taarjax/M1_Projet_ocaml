@@ -1,210 +1,183 @@
-(* ETERNITY II PROJECT *)
-open Printf;;
+(* Définition des types et constantes *)
+type edge = int
+type color = int
+type piece = {top: edge; right: edge; bottom: edge; left: edge}
+type piece_option = piece option
+
+let colors = [1; 2; 3; 4]
+let edge_types = [1; 2; 3; 4;5;6;7;8;9]
+let n, m = 12, 12
+
+let print_piece piece =
+  Printf.printf "{%d %d %d %d}" piece.top piece.right piece.bottom piece.left
+
+  let print_puzzle puzzle =
+    Array.iter
+      (fun row ->
+        Array.iter
+          (fun piece_option ->
+            match piece_option with
+            | Some piece -> print_piece piece
+            | None -> Printf.printf "      ")
+          row;
+        print_endline "")
+      puzzle
+
+(* Fonction pour générer des pièces aléatoires *)
+let random_piece () =
+  let random_edge () = List.nth edge_types (Random.int (List.length edge_types)) in
+  {top = random_edge (); right = random_edge (); bottom = random_edge (); left = random_edge ()}
+
+(* Fonction pour générer un puzzle aléatoire *)
+let generate_puzzle n m =
+  let rec generate_puzzle_aux puzzle n m =
+    if n = 0 then puzzle
+    else
+      let row = List.init m (fun _ -> random_piece ()) in
+      generate_puzzle_aux (row :: puzzle) (n - 1) m
+  in
+  generate_puzzle_aux [] n m
 
 
-(* ----------------------------------------------------------------------------------
-                                  Définition des types
-    ---------------------------------------------------------------------------------- *)
-type color = 
-  | Red 
-  | Green
-  | Blue
-  | Yellow
-  | Orange
-  | Purple
-  | Brown
-  | Pink
-  | Cyan
-  | Grey 
-;;
+(* Fonction pour vérifier si une pièce peut être placée à une position spécifique *)
+let piece_fits puzzle piece i j =
+  let top_fits = i = 0 || (match puzzle.(i - 1).(j) with
+                          | Some p -> p.bottom = piece.top
+                          | None -> false) in
+  let left_fits = j = 0 || (match puzzle.(i).(j - 1) with
+                          | Some p -> p.right = piece.left
+                          | None -> false) in
+  top_fits && left_fits
 
-let string_of_color c = 
-  match c with
-  | Red -> "Red"
-  | Green -> "Green"
-  | Blue -> "Blue"
-  | Yellow -> "Yellow"
-  | Orange -> "Orange"
-  | Purple -> "Purple"
-  | Brown -> "Brown"
-  | Pink -> "Pink"
-  | Cyan -> "Cyan"
-  | Grey -> "Grey"
-;;
+  (* Fonction pour générer une bordure aléatoire *)
+let random_edge () = List.nth edge_types (Random.int (List.length edge_types))
+(* Fonction pour résoudre le puzzle en utilisant le backtracking *)
+let rec solve puzzle pieces i j =
+  if i = n then true
+  else if j = m then solve puzzle pieces (i + 1) 0
+  else if puzzle.(i).(j) <> None then solve puzzle pieces i (j + 1)
+  else
+    let rec try_pieces pieces =
+      match pieces with
+      | [] -> false
+      | piece :: rest ->
+        if piece_fits puzzle piece i j then (
+          puzzle.(i).(j) <- Some piece;
+          if solve puzzle rest i (j + 1) then true
+          else (
+            puzzle.(i).(j) <- None;
+            try_pieces rest
+          )
+        )
+        else try_pieces rest
+    in
+    try_pieces pieces
 
-let color_to_rgb c = 
-  match c with
-  | Red -> "255,0,0"
-  | Green -> "0,255,0"
-  | Blue -> "0,0,255"
-  | Yellow -> "255,255,0"
-  | Orange -> "255,165,0"
-  | Purple -> "128,0,128"
-  | Brown -> "165,42,42"
-  | Pink -> "255,192,203"
-  | Cyan -> "0,255,255"
-  | Grey -> "128,128,128"
-;;
+(* Fonction pour générer un puzzle solvable *)
+let generate_solvable_puzzle n m =
+  let puzzle = Array.make_matrix n m None in
+  let gray = 0 in
+  for i = 0 to n - 1 do
+    for j = 0 to m - 1 do
+      let top = if i = 0 then gray else (Option.get puzzle.(i - 1).(j)).bottom in
+      let left = if j = 0 then gray else (Option.get puzzle.(i).(j - 1)).right in
+      let bottom = if i = n - 1 then gray else random_edge () in
+      let right = if j = m - 1 then gray else random_edge () in
+      puzzle.(i).(j) <- Some {top; right; bottom; left}
+    done
+  done;
+  puzzle
 
-(* ----------------------------------------------------------------------------------
-                                  Création des pièces
-    ---------------------------------------------------------------------------------- *)
-(* Type d'une pièce *)
-type piece = {
-  edge_colors : color list;
-  id : int;  
-};;
-
-(* Une piece ne peut pas avoir le même identifiant *)
-let last_piece_id = ref 0 
-let next_piece_id () = 
-  last_piece_id := !last_piece_id + 1;
-  !last_piece_id;;
-
-(* Méthode pour créer une pièce de centre *)
-let piece_counter = ref 0;;
-let create_piece c1 c2 c3 c4 : piece =
-  let piece = { id = !piece_counter; edge_colors = [c1; c2; c3; c4];} in
-  piece_counter := !piece_counter + 1;
-  piece;;
-
-let create_corner_piece c1 c2: piece = 
-  create_piece c1 c2 Grey Grey;;
-
-let create_edge_piece c1 c2 c3: piece =
-  create_piece c1 c2 c3 Grey;;
-
-
-(* Méthode pour afficher une pièce format SVG*)
-(* Couleur GAUCHE HAUT DROITE BAS *)
-let piece_to_svg piece = 
-  let svg_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" ^ "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100\" height=\"100\">\n" in
-  let svg_footer = "</svg>\n" in
-  let triangle1 = "<polygon points=\"0,0 50,50 0,100\" fill=\"rgb(" ^ (color_to_rgb (List.nth piece.edge_colors 0)) ^ ")\" />\n" in
-  let triangle2 = "<polygon points=\"0,0 50,50 100,0\" fill=\"rgb(" ^ (color_to_rgb (List.nth piece.edge_colors 1)) ^ ")\" />\n" in
-  let triangle3 = "<polygon points=\"100,0 50,50 100,100\" fill=\"rgb(" ^ (color_to_rgb (List.nth piece.edge_colors 2)) ^ ")\" />\n" in
-  let triangle4 = "<polygon points=\"0,100 50,50 100,100\" fill=\"rgb(" ^ (color_to_rgb (List.nth piece.edge_colors 3)) ^ ")\" />\n" in
-  svg_header ^ triangle1 ^ triangle2 ^ triangle3 ^ triangle4 ^ svg_footer;;
-
-let create_piece_svg piece = 
-  let file_name = "piece_" ^ string_of_int piece.id ^ ".svg" in
-  let svg = piece_to_svg piece in
-  let oc = open_out file_name in
-  Printf.fprintf oc "%s" svg;
-  close_out oc;;
-
-(* Affichage des propriétés d'une pièce *)
-let print_piece piece = 
-  Printf.printf "ID : %d\n" piece.id;
-  Printf.printf "Couleurs : %s\n" (String.concat ", " (List.map string_of_color piece.edge_colors));;
-
-
-(* ----------------------------------------------------------------------------------
-                                  Création du plateau
-    ---------------------------------------------------------------------------------- *)
-(* Type d'un plateau *)
-type board = piece option array array ;;
-
-(* Méthode pour créer un plateau *)
-let create_board n m : board =
-  Array.make_matrix n m None;;
- 
-(* Nombre de coins : 4
-   Nombre de bord :  2(m + n − 4)
-   Nombre de pièce intérieurs : (n - 2) * (m - 2)
-*)
-
-(* Remplir le plateau avec le bon nombre de piece *)
-
-
-
-
-
-(* ----------------------------------------------------------------------------------
-                                 GETTER & SETTER
-    ---------------------------------------------------------------------------------- *)
-
-(* Méthode pour retourner une piece du plateau à la position (x,y) *)
-let get_piece board x y : piece option = 
-  board.(x).(y);;
-
-(* Méthode pour modifier la pièce à la position (x,y) *)
-let set_piece board x y piece : unit = 
-  board.(x).(y) <- Some piece;;
-
-
-(* ----------------------------------------------------------------------------------
-                                MANIPULATION DES PIECES
-  ---------------------------------------------------------------------------------- *)
-
-(* Méthode pour rotationner une pièece de 1 2 ou 3 quart 
-  Les couleurs seront donc décalées de 1 2 ou 3 dans le sens horaire *)
-let rotate_piece piece n : piece =
-  let new_edge_colors = match n with 
-  | 1 -> [List.nth piece.edge_colors 3; List.nth piece.edge_colors 0; List.nth piece.edge_colors 1; List.nth piece.edge_colors 2]
-  | 2 -> [List.nth piece.edge_colors 2; List.nth piece.edge_colors 3; List.nth piece.edge_colors 0; List.nth piece.edge_colors 1]
-  | 3 -> [List.nth piece.edge_colors 1; List.nth piece.edge_colors 2; List.nth piece.edge_colors 3; List.nth piece.edge_colors 0]
-  | _ -> failwith "Invalid rotation number"
-  in { id = piece.id; edge_colors = new_edge_colors }
-
-
-let flip_vertical piece : piece = 
-  { id = piece.id; edge_colors = [List.nth piece.edge_colors 2; List.nth piece.edge_colors 1; List.nth piece.edge_colors 0; List.nth piece.edge_colors 3] }
-
-let flip_horizontal piece : piece = 
-  { id = piece.id; edge_colors = [List.nth piece.edge_colors 0; List.nth piece.edge_colors 3; List.nth piece.edge_colors 2; List.nth piece.edge_colors 1] }
-
+  let edge_to_color edge =
+    match edge with
+    | 1 -> "red"
+    | 2 -> "blue"
+    | 3 -> "green"
+    | 4 -> "yellow"
+    | 5 -> "orange"
+    | 6 -> "purple"
+    | 7 -> "cyan"
+    | 8 -> "magenta"
+    | 9 -> "lime"
+    | _ -> "black"
   
+  let piece_to_svg piece =
+    let side_to_polygon side color =
+      match side with
+      | "top" -> Printf.sprintf "<polygon points=\"0,0 50,50 0,100\" fill=\"%s\" />" color
+      | "right" -> Printf.sprintf "<polygon points=\"0,0 50,50 100,0\" fill=\"%s\" />" color
+      | "bottom" -> Printf.sprintf "<polygon points=\"100,0 50,50 100,100\" fill=\"%s\" />" color
+      | "left" -> Printf.sprintf "<polygon points=\"0,100 50,50 100,100\" fill=\"%s\" />" color
+      | _ -> failwith "Invalid side"
+    in
   
+    let top = side_to_polygon "top" (edge_to_color piece.left) in
+    let right = side_to_polygon "right" (edge_to_color piece.top) in
+    let bottom = side_to_polygon "bottom" (edge_to_color piece.right) in
+    let left = side_to_polygon "left" (edge_to_color piece.bottom) in
+  
+    Printf.sprintf "<g>\n%s\n%s\n%s\n%s\n</g>" top right bottom left
 
-
-(* ----------------------------------------------------------------------------------
-                                 TESTS
-    ---------------------------------------------------------------------------------- *)
-
-(* On fait tourner la piece jusqu'a ce qu'elle revienne a son état intiale.
-   Si => true => la méthode rotate_piece fonctionne correctement
-   Sinon => false *)
-   (* OK *)
-let is_rotation_valid piece1 piece2 : bool = 
-  let rec aux piece1 piece2 i = 
-    if i = 4 then false
-    else if piece1.edge_colors = piece2.edge_colors then true
-    else aux piece1 (rotate_piece piece2 1) (i + 1)
-  in aux piece1 piece2 0;;
-
-  (* OK *)
-let is_flip_vertical_valid piece1 piece2 : bool = 
-  piece1.edge_colors = (flip_vertical piece2).edge_colors;;
-
-  (* OK *)
-let is_flip_horizontal_valid piece1 piece2 : bool =
-  piece1.edge_colors = (flip_horizontal piece2).edge_colors;;
-
-
-(* ----------------------------------------------------------------------------------
-                                 MAIN
-    ---------------------------------------------------------------------------------- *)
+    let pieces_to_svg puzzle filename =
+      let header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" in
+      let piece_width = 100 in
+      let piece_height = 100 in
+      let width = Array.length puzzle.(0) * piece_width in
+      let height = Array.length puzzle * piece_height in
+      let header_svg = Printf.sprintf "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">" width height in
+      let footer = "</svg>" in
     
+      let body = Array.mapi (fun i row ->
+        Array.mapi (fun j piece_option ->
+          match piece_option with
+          | Some piece ->
+            let x = j * piece_width in
+            let y = i * piece_height in
+            Printf.sprintf "<g transform=\"translate(%d, %d)\">%s</g>" x y (piece_to_svg piece)
+          | None -> ""
+        ) row
+      ) puzzle in
+    
+      let svg = header ^ header_svg ^ (String.concat "\n" (Array.to_list (Array.map (String.concat "\n") (Array.map (Array.to_list) body)))) ^ footer in
+      let oc = open_out filename in
+      output_string oc svg;
+      close_out oc
 
-(* let piece2 = flip_vertical piece1;; *)
-(* let piece2 = flip_horizontal piece1;; *)
-let piece1 = create_piece Red Green Blue Yellow;;
-let piece2 = rotate_piece piece1 1;;
-print_piece piece1;;
-print_piece piece2;;
-create_piece_svg piece1;;
-create_piece_svg piece2;;
+      let print_svg puzzle filename =
+        pieces_to_svg puzzle filename
+    
+  
 
 
-(* Test rotation de la piece 1 et 2 *)
-(* let result = is_rotation_valid piece1 piece2 in
-Printf.printf "Is rotation valid: %b\n" result;; *)
 
-(* Test flip vertical de la piece 1 et 2 *)
-(* let result = is_flip_vertical_valid piece1 piece2 in
-Printf.printf "Is flip vertical valid: %b\n" result;; *)
+  let shuffle_puzzle puzzle =
+    let shuffled_puzzle = Array.map Array.copy puzzle in
+    let n, m = Array.length puzzle, Array.length puzzle.(0) in
+    for i = n - 1 downto 1 do
+      for j = m - 1 downto 1 do
+        let i' = Random.int (i + 1) in
+        let j' = Random.int (j + 1) in
+        let tmp = shuffled_puzzle.(i).(j) in
+        shuffled_puzzle.(i).(j) <- shuffled_puzzle.(i').(j');
+        shuffled_puzzle.(i').(j') <- tmp
+      done
+    done;
+    shuffled_puzzle
 
-(* Test flip horizontal de la piece 1 et 2 *)
-(* let result = is_flip_horizontal_valid piece1 piece2 in
-Printf.printf "Is flip horizontal valid: %b\n" result;; *)
+    (* Programme principal *)
+    let () =
+    Random.self_init ();
+    let puzzle = generate_solvable_puzzle n m in
+    let puzzle_shuffle = shuffle_puzzle puzzle in
+    print_endline "Puzzle mélangé :";
+    print_puzzle puzzle_shuffle;
+    print_svg puzzle_shuffle "puzzle_melange.svg";
+    let pieces = List.flatten (Array.to_list (Array.map Array.to_list puzzle)) in
+    let solved = solve puzzle (List.map Option.get pieces) 0 0 in
+    if solved then (
+      Printf.printf "Le puzzle a été résolu!\n";
+      print_endline "Puzzle résolu :";
+      print_puzzle puzzle;
+      print_svg puzzle "puzzle_resolu.svg";
+    ) else Printf.printf "Le puzzle n'a pas pu être résolu!\n"
+  
