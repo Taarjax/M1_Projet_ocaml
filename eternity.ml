@@ -6,7 +6,7 @@ type piece_option = piece option
 
 let colors = [1; 2; 3; 4]
 let edge_types = [1; 2; 3; 4;5;6;7;8;9]
-let n, m = 3, 3
+let n, m = 12, 12
 
 let print_piece piece =
   Printf.printf "{%d %d %d %d}" piece.top piece.right piece.bottom piece.left
@@ -89,6 +89,82 @@ let rec solve (puzzle: piece option array array) (pieces: piece list) (i: int) (
     in
     try_pieces pieces
 
+    let rec solve_heuristic (puzzle: piece option array array) (pieces: piece list) (i: int) (j: int) : piece option array array option =
+      if i = n && j = 0 then
+        Some puzzle
+      else
+        let next_i, next_j = if j = m - 1 then i + 1, 0 else i, j + 1 in
+    
+        let matching_edges_count piece =
+          let count = ref 0 in
+          if i > 0 && puzzle.(i - 1).(j) <> None && (Option.get puzzle.(i - 1).(j)).bottom = piece.top then incr count;
+          if j > 0 && puzzle.(i).(j - 1) <> None && (Option.get puzzle.(i).(j - 1)).right = piece.left then incr count;
+          if i < n - 1 && puzzle.(i + 1).(j) <> None && (Option.get puzzle.(i + 1).(j)).top = piece.bottom then incr count;
+          if j < m - 1 && puzzle.(i).(j + 1) <> None && (Option.get puzzle.(i).(j + 1)).left = piece.right then incr count;
+          !count
+        in
+    
+        let sorted_pieces = List.sort (fun p1 p2 -> compare (matching_edges_count p2) (matching_edges_count p1)) pieces in
+    
+        let try_piece piece =
+          let piece_fits_in_current_position = piece_fits puzzle piece i j in
+          if piece_fits_in_current_position then (
+            puzzle.(i).(j) <- Some piece;
+            match solve_heuristic puzzle (List.filter ((<>) piece) pieces) next_i next_j with
+            | Some _ as solved_puzzle -> solved_puzzle
+            | None ->
+              puzzle.(i).(j) <- None;
+              None
+          ) else
+            None
+        in
+    
+        let rec try_pieces pieces =
+          match pieces with
+          | [] -> None
+          | piece :: remaining_pieces ->
+            (match try_piece piece with
+            | Some _ as solved_puzzle -> solved_puzzle
+            | None -> try_pieces remaining_pieces)
+        in
+        try_pieces sorted_pieces
+    
+        let count_compatible_sides puzzle piece i j =
+          let gray = 0 in
+          let top = if i = 0 then gray else (Option.get puzzle.(i - 1).(j)).bottom in
+          let left = if j = 0 then gray else (Option.get puzzle.(i).(j - 1)).right in
+          let count = ref 0 in
+          if piece.top = top then incr count;
+          if piece.left = left then incr count;
+          !count
+        
+          let rec solve_fast (puzzle: piece option array array) (pieces: piece list) (i: int) (j: int) : piece option array array option =
+            if i = n && j = 0 then
+              Some puzzle
+            else
+              let next_i, next_j = if j = m - 1 then i + 1, 0 else i, j + 1 in
+              let sorted_pieces = List.sort (fun p1 p2 ->
+                let count1 = count_compatible_sides puzzle p1 i j in
+                let count2 = count_compatible_sides puzzle p2 i j in
+                compare count2 count1
+              ) pieces in
+              let rec try_pieces remaining_pieces =
+                match remaining_pieces with
+                | [] -> None
+                | piece :: other_pieces ->
+                  let piece_fits_in_current_position = piece_fits puzzle piece i j in
+                  if piece_fits_in_current_position then (
+                    puzzle.(i).(j) <- Some piece;
+                    match solve_fast puzzle (List.filter ((<>) piece) pieces) next_i next_j with
+                    | Some _ as solved_puzzle -> solved_puzzle
+                    | None ->
+                      puzzle.(i).(j) <- None;
+                      try_pieces other_pieces
+                  ) else
+                    try_pieces other_pieces
+              in
+              try_pieces sorted_pieces
+          
 
     (* Fonction pour générer un puzzle solvable *)
 (* Fonction pour générer un puzzle solvable *)
@@ -180,7 +256,7 @@ let generate_solvable_puzzle n m =
 
     (* Programme principal *)
 
-  let () =
+    let () =
     Random.self_init ();
     let soluce = generate_solvable_puzzle n m in
     print_endline "SOLUTION DU PUZZLE";
@@ -193,7 +269,10 @@ let generate_solvable_puzzle n m =
     let pieces = List.flatten (Array.to_list (Array.map Array.to_list shuffled_puzzle)) in
     let pieces_filtered = List.filter_map Fun.id pieces in
     
+    let start_time = Sys.time () in
+  
     let rec solve_until_found pieces =
+      (* match solve_heuristic shuffled_puzzle pieces_filtered 0 0 with *)
       match solve shuffled_puzzle pieces 0 0 with
       | Some solved_puzzle ->
         print_endline "Puzzle résolu!";
@@ -203,4 +282,36 @@ let generate_solvable_puzzle n m =
         (* print_endline "Puzzle non résolu. Réessayer..."; *)
         solve_until_found pieces_filtered
     in
-    solve_until_found pieces_filtered
+    solve_until_found pieces_filtered;
+  
+    let end_time = Sys.time () in
+    let elapsed_time = end_time -. start_time in
+    Printf.printf "Temps d'exécution: %f secondes\n" elapsed_time;
+  
+
+
+   (* let () =
+   Random.self_init ();
+   let soluce = generate_solvable_puzzle n m in
+   print_endline "SOLUTION DU PUZZLE";
+   print_puzzle soluce;
+   print_svg soluce "Solution_que_lalgo_doit_avoir.svg";
+   let shuffled_puzzle = shuffle_puzzle soluce in
+   print_endline "PUZZLE MELANGE";
+   print_puzzle shuffled_puzzle;
+   print_svg shuffled_puzzle "puzzle_melanger_a_resoudre.svg";
+   let pieces = List.flatten (Array.to_list (Array.map Array.to_list shuffled_puzzle)) in
+   let pieces_filtered = List.filter_map Fun.id pieces in
+
+   let rec solve_until_found pieces =
+     match solve_fast shuffled_puzzle pieces 0 0 with
+     | Some solved_puzzle ->
+       print_endline "Puzzle résolu!";
+       print_puzzle solved_puzzle;
+       print_svg solved_puzzle "Solution_de_lalgo.svg"
+     | None ->
+       (* print_endline "Puzzle non résolu. Réessayer..."; *)
+       solve_until_found pieces_filtered
+   in
+   solve_until_found pieces_filtered; *)
+
