@@ -6,7 +6,7 @@ type piece_option = piece option
 
 let colors = [1; 2; 3; 4]
 let edge_types = [1; 2; 3; 4;5;6;7;8;9]
-let n, m = 12, 12
+let n, m = 3, 3
 
 let print_piece piece =
   Printf.printf "{%d %d %d %d}" piece.top piece.right piece.bottom piece.left
@@ -29,50 +29,68 @@ let random_piece () =
   {top = random_edge (); right = random_edge (); bottom = random_edge (); left = random_edge ()}
 
 (* Fonction pour générer un puzzle aléatoire *)
-let generate_puzzle n m =
+(* let generate_puzzle n m =
   let rec generate_puzzle_aux puzzle n m =
     if n = 0 then puzzle
     else
       let row = List.init m (fun _ -> random_piece ()) in
       generate_puzzle_aux (row :: puzzle) (n - 1) m
   in
-  generate_puzzle_aux [] n m
+  generate_puzzle_aux [] n m *)
 
 
 (* Fonction pour vérifier si une pièce peut être placée à une position spécifique *)
+(* La couleur du bord haut de la piece doit etre égale à la couleur du bord bas de la piece du dessus (si elle existe) *)
+(* La couleur du bord gauche de la piece doit etre égale à la couleur du bord droit de la piece de gauche (si elle existe) *)
+(* La couleur du bord bas de la piece doit etre égale à la couleur du bord haut de la piece du dessous (si elle existe) *)
+(* La couleur du bord droit de la piece doit etre égale à la couleur du bord gauche de la piece de droite (si elle existe) *)
 let piece_fits puzzle piece i j =
-  let top_fits = i = 0 || (match puzzle.(i - 1).(j) with
-                          | Some p -> p.bottom = piece.top
-                          | None -> false) in
-  let left_fits = j = 0 || (match puzzle.(i).(j - 1) with
-                          | Some p -> p.right = piece.left
-                          | None -> false) in
-  top_fits && left_fits
+  let gray = 0 in
+  let top = if i = 0 then gray else (Option.get puzzle.(i - 1).(j)).bottom in
+  let left = if j = 0 then gray else (Option.get puzzle.(i).(j - 1)).right in
+  piece.top = top && piece.left = left
+
+
 
   (* Fonction pour générer une bordure aléatoire *)
-let random_edge () = List.nth edge_types (Random.int (List.length edge_types))
+let random_edge () = List.nth edge_types (Random.int (List.length edge_types)
+)
+
+(* Fonction pour faire pivoter une pièce *)
+
+let rotate (piece: piece) : piece =
+  { top = piece.left; right = piece.top; bottom = piece.right; left = piece.bottom }
+ 
 (* Fonction pour résoudre le puzzle en utilisant le backtracking *)
-let rec solve puzzle pieces i j =
-  if i = n then true
-  else if j = m then solve puzzle pieces (i + 1) 0
-  else if puzzle.(i).(j) <> None then solve puzzle pieces i (j + 1)
+let rec solve (puzzle: piece option array array) (pieces: piece list) (i: int) (j: int) : piece option array array option =
+  if i = n && j = 0 then
+    Some puzzle
   else
+    let next_i, next_j = if j = m - 1 then i + 1, 0 else i, j + 1 in
+    let try_piece piece =
+      let piece_fits_in_current_position = piece_fits puzzle piece i j in
+      if piece_fits_in_current_position then (
+        puzzle.(i).(j) <- Some piece;
+        match solve puzzle (List.filter ((<>) piece) pieces) next_i next_j with
+        | Some _ as solved_puzzle -> solved_puzzle
+        | None ->
+          puzzle.(i).(j) <- None;
+          None
+      ) else
+        None
+    in
     let rec try_pieces pieces =
       match pieces with
-      | [] -> false
-      | piece :: rest ->
-        if piece_fits puzzle piece i j then (
-          puzzle.(i).(j) <- Some piece;
-          if solve puzzle rest i (j + 1) then true
-          else (
-            puzzle.(i).(j) <- None;
-            try_pieces rest
-          )
-        )
-        else try_pieces rest
+      | [] -> None
+      | piece :: remaining_pieces ->
+        (match try_piece piece with
+        | Some _ as solved_puzzle -> solved_puzzle
+        | None -> try_pieces remaining_pieces)
     in
     try_pieces pieces
 
+
+    (* Fonction pour générer un puzzle solvable *)
 (* Fonction pour générer un puzzle solvable *)
 let generate_solvable_puzzle n m =
   let puzzle = Array.make_matrix n m None in
@@ -147,16 +165,12 @@ let generate_solvable_puzzle n m =
         pieces_to_svg puzzle filename
     
   
-
-
-
   let shuffle_puzzle puzzle =
-    let shuffled_puzzle = Array.map Array.copy puzzle in
-    let n, m = Array.length puzzle, Array.length puzzle.(0) in
-    for i = n - 1 downto 1 do
-      for j = m - 1 downto 1 do
-        let i' = Random.int (i + 1) in
-        let j' = Random.int (j + 1) in
+    let shuffled_puzzle = Array.copy puzzle in
+    for i = 0 to n - 1 do
+      for j = 0 to m - 1 do
+        let i' = Random.int n in
+        let j' = Random.int m in
         let tmp = shuffled_puzzle.(i).(j) in
         shuffled_puzzle.(i).(j) <- shuffled_puzzle.(i').(j');
         shuffled_puzzle.(i').(j') <- tmp
@@ -165,19 +179,28 @@ let generate_solvable_puzzle n m =
     shuffled_puzzle
 
     (* Programme principal *)
-    let () =
+
+  let () =
     Random.self_init ();
-    let puzzle = generate_solvable_puzzle n m in
-    let puzzle_shuffle = shuffle_puzzle puzzle in
-    print_endline "Puzzle mélangé :";
-    print_puzzle puzzle_shuffle;
-    print_svg puzzle_shuffle "puzzle_melange.svg";
-    let pieces = List.flatten (Array.to_list (Array.map Array.to_list puzzle)) in
-    let solved = solve puzzle (List.map Option.get pieces) 0 0 in
-    if solved then (
-      Printf.printf "Le puzzle a été résolu!\n";
-      print_endline "Puzzle résolu :";
-      print_puzzle puzzle;
-      print_svg puzzle "puzzle_resolu.svg";
-    ) else Printf.printf "Le puzzle n'a pas pu être résolu!\n"
-  
+    let soluce = generate_solvable_puzzle n m in
+    print_endline "SOLUTION DU PUZZLE";
+    print_puzzle soluce;
+    print_svg soluce "Solution_que_lalgo_doit_avoir.svg";
+    let shuffled_puzzle = shuffle_puzzle soluce in
+    print_endline "PUZZLE MELANGE";
+    print_puzzle shuffled_puzzle;
+    print_svg shuffled_puzzle "puzzle_melanger_a_resoudre.svg";
+    let pieces = List.flatten (Array.to_list (Array.map Array.to_list shuffled_puzzle)) in
+    let pieces_filtered = List.filter_map Fun.id pieces in
+    
+    let rec solve_until_found pieces =
+      match solve shuffled_puzzle pieces 0 0 with
+      | Some solved_puzzle ->
+        print_endline "Puzzle résolu!";
+        print_puzzle solved_puzzle;
+        print_svg solved_puzzle "Solution_de_lalgo.svg"
+      | None ->
+        (* print_endline "Puzzle non résolu. Réessayer..."; *)
+        solve_until_found pieces_filtered
+    in
+    solve_until_found pieces_filtered
