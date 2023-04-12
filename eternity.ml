@@ -6,7 +6,7 @@ type piece_option = piece option
 
 let colors = [1; 2; 3; 4]
 let edge_types = [1; 2; 3; 4;5;6;7;8;9]
-let n, m = 12, 12
+let n, m = 10, 10
 
 let print_piece piece =
   Printf.printf "{%d %d %d %d}" piece.top piece.right piece.bottom piece.left
@@ -89,7 +89,9 @@ let rec solve (puzzle: piece option array array) (pieces: piece list) (i: int) (
     in
     try_pieces pieces
 
-    let rec solve_heuristic (puzzle: piece option array array) (pieces: piece list) (i: int) (j: int) : piece option array array option =
+    
+
+    (* let rec solve_heuristic (puzzle: piece option array array) (pieces: piece list) (i: int) (j: int) : piece option array array option =
       if i = n && j = 0 then
         Some puzzle
       else
@@ -136,9 +138,10 @@ let rec solve (puzzle: piece option array array) (pieces: piece list) (i: int) (
           let count = ref 0 in
           if piece.top = top then incr count;
           if piece.left = left then incr count;
-          !count
+          !count *)
         
-          let rec solve_fast (puzzle: piece option array array) (pieces: piece list) (i: int) (j: int) : piece option array array option =
+
+          (* let rec solve_fast (puzzle: piece option array array) (pieces: piece list) (i: int) (j: int) : piece option array array option =
             if i = n && j = 0 then
               Some puzzle
             else
@@ -163,7 +166,7 @@ let rec solve (puzzle: piece option array array) (pieces: piece list) (i: int) (
                   ) else
                     try_pieces other_pieces
               in
-              try_pieces sorted_pieces
+              try_pieces sorted_pieces *)
           
 
     (* Fonction pour générer un puzzle solvable *)
@@ -279,7 +282,7 @@ let generate_solvable_puzzle n m =
         print_puzzle solved_puzzle;
         print_svg solved_puzzle "Solution_de_lalgo.svg"
       | None ->
-        (* print_endline "Puzzle non résolu. Réessayer..."; *)
+        print_endline "Puzzle non résolu. Réessayer...";
         solve_until_found pieces_filtered
     in
     solve_until_found pieces_filtered;
