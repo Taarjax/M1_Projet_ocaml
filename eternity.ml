@@ -105,7 +105,6 @@ let rec solve puzzle pieces i j =
     in
     try_remaining_pieces pieces
 
-
 (* Fonction pour mélanger le puzzle *)
   let shuffle_puzzle puzzle =
     let shuffled_puzzle = Array.copy puzzle in
@@ -138,6 +137,7 @@ let rec solve puzzle pieces i j =
           row;
         print_endline "")
       puzzle
+
   
   (* Fonction pour générer le SVG d'une pièce *)
   let piece_to_svg piece =
@@ -187,21 +187,8 @@ let rec solve puzzle pieces i j =
       let print_svg puzzle filename =
         pieces_to_svg puzzle filename
 
-
 (*  --------------------------UTILS--------------------------  *)
 
-(* Exemple content of txt file : 
-6 1 0 9 ; 3 2 2 2 ; 3 0 3 9 ; 3 9 6 2 ;
-3 0 0 1 ; 0 2 8 0 ; 8 3 8 0 ; 7 6 3 3 ;
-2 9 0 7 ; 0 0 8 3 ; 7 7 0 0 ; 8 2 7 0 ;
-0 9 7 2 ; 4 8 3 6 ; 0 3 4 9 ; 8 0 3 8 ;
-
-The pieces are separated by ";" and the ensemble of pieces is the puzzle
-For example : "6 1 0 9" is a piece with top = 6, right = 1, bottom = 0, left = 9
-puzzle must be a piece option array array
-pieces must be a piece list
-*)
-(* Fonction pour importer un puzzle depuis un fichier texte *)
 (* Fonction pour importer un puzzle depuis un fichier texte *)
 let import_puzzle filename =
   let lines = ref [] in
@@ -228,8 +215,6 @@ let import_puzzle filename =
     ) lines) in
     puzzle
 
-
-
 (* Fonction pour extraire les pièces d'un puzzle *)
 let get_pieces_from_puzzle (puzzle: piece option array array) : piece list =
   let pieces = ref [] in
@@ -242,8 +227,6 @@ let get_pieces_from_puzzle (puzzle: piece option array array) : piece list =
   done;
   !pieces
 
-
-
 (* Programme principal *)
 let p1() =
   Random.self_init ();
@@ -255,6 +238,7 @@ let p1() =
   print_endline "PUZZLE MELANGE";
   print_puzzle shuffled_puzzle;
   print_svg shuffled_puzzle "puzzle_melanger_a_resoudre.svg";
+
 
   let pieces = List.flatten (Array.to_list (Array.map Array.to_list shuffled_puzzle)) in
   let pieces_filtered = List.filter_map Fun.id pieces in
@@ -279,12 +263,13 @@ let p1() =
   Printf.printf "Temps d'exécution: %f secondes\n" elapsed_time;;
 
 let p2() = 
-  let puzzle_115s = import_puzzle "puzzle.txt" in
+  let puzzle_115s = import_puzzle "puzzle_115s.txt" in
   print_endline "PUZZLE DEPUIS FICHIER";
   print_puzzle puzzle_115s;
   let start_time = Sys.time () in
 
   let solution = solve puzzle_115s (get_pieces_from_puzzle puzzle_115s) 0 0 in
+  (* let solution = solve_forward_checking puzzle_115s (get_pieces_from_puzzle puzzle_115s) 0 0 in *)
   match solution with
   | Some solved_puzzle ->
     print_endline "Puzzle importé résolu!";
@@ -296,10 +281,9 @@ let p2() =
   | None ->
     print_endline "Puzzle importé non résolu. Réessayer...";;
 
-
 let main () =
-  p1()
-  (* p2();; *)
+  (* p1() *)
+  p2();;
 
 let () = main ()
 
