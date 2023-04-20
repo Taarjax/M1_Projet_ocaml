@@ -1,25 +1,385 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="200"><g transform="translate(0, 0)"><g>
-<polygon points="0,0 50,50 0,100" fill="gray" />
-<polygon points="0,0 50,50 100,0" fill="purple" />
-<polygon points="100,0 50,50 100,100" fill="cyan" />
-<polygon points="0,100 50,50 100,100" fill="gray" />
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="800" height="800"><g transform="translate(0, 0)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="gray" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
 </g></g>
 <g transform="translate(100, 0)"><g>
 <polygon points="0,0 50,50 0,100" fill="cyan" />
+<polygon points="0,0 50,50 100,0" fill="yellow" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="gray" />
+</g></g>
+<g transform="translate(200, 0)"><g>
+<polygon points="0,0 50,50 0,100" fill="gray" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="blue" />
+</g></g>
+<g transform="translate(300, 0)"><g>
+<polygon points="0,0 50,50 0,100" fill="red" />
 <polygon points="0,0 50,50 100,0" fill="orange" />
+<polygon points="100,0 50,50 100,100" fill="cyan" />
+<polygon points="0,100 50,50 100,100" fill="lime" />
+</g></g>
+<g transform="translate(400, 0)"><g>
+<polygon points="0,0 50,50 0,100" fill="gray" />
+<polygon points="0,0 50,50 100,0" fill="magenta" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="gray" />
+</g></g>
+<g transform="translate(500, 0)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="gray" />
+<polygon points="0,100 50,50 100,100" fill="green" />
+</g></g>
+<g transform="translate(600, 0)"><g>
+<polygon points="0,0 50,50 0,100" fill="magenta" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
 <polygon points="100,0 50,50 100,100" fill="gray" />
 <polygon points="0,100 50,50 100,100" fill="gray" />
 </g></g>
-<g transform="translate(0, 100)"><g>
-<polygon points="0,0 50,50 0,100" fill="green" />
-<polygon points="0,0 50,50 100,0" fill="gray" />
-<polygon points="100,0 50,50 100,100" fill="gray" />
-<polygon points="0,100 50,50 100,100" fill="orange" />
+<g transform="translate(700, 0)"><g>
+<polygon points="0,0 50,50 0,100" fill="cyan" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="red" />
+<polygon points="0,100 50,50 100,100" fill="yellow" />
 </g></g>
-<g transform="translate(100, 100)"><g>
+<g transform="translate(0, 100)"><g>
 <polygon points="0,0 50,50 0,100" fill="gray" />
 <polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(100, 100)"><g>
+<polygon points="0,0 50,50 0,100" fill="magenta" />
+<polygon points="0,0 50,50 100,0" fill="orange" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="orange" />
+</g></g>
+<g transform="translate(200, 100)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="magenta" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="orange" />
+</g></g>
+<g transform="translate(300, 100)"><g>
+<polygon points="0,0 50,50 0,100" fill="yellow" />
+<polygon points="0,0 50,50 100,0" fill="lime" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="magenta" />
+</g></g>
+<g transform="translate(400, 100)"><g>
+<polygon points="0,0 50,50 0,100" fill="cyan" />
+<polygon points="0,0 50,50 100,0" fill="magenta" />
+<polygon points="100,0 50,50 100,100" fill="red" />
+<polygon points="0,100 50,50 100,100" fill="yellow" />
+</g></g>
+<g transform="translate(500, 100)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="lime" />
+<polygon points="100,0 50,50 100,100" fill="purple" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(600, 100)"><g>
+<polygon points="0,0 50,50 0,100" fill="red" />
+<polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="blue" />
+</g></g>
+<g transform="translate(700, 100)"><g>
+<polygon points="0,0 50,50 0,100" fill="orange" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="magenta" />
+</g></g>
+<g transform="translate(0, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="cyan" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="orange" />
+<polygon points="0,100 50,50 100,100" fill="yellow" />
+</g></g>
+<g transform="translate(100, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="lime" />
+</g></g>
+<g transform="translate(200, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="cyan" />
+<polygon points="0,0 50,50 100,0" fill="yellow" />
+<polygon points="100,0 50,50 100,100" fill="gray" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(300, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="yellow" />
+<polygon points="0,0 50,50 100,0" fill="blue" />
+<polygon points="100,0 50,50 100,100" fill="orange" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(400, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="blue" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="purple" />
+</g></g>
+<g transform="translate(500, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="magenta" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(600, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="gray" />
+<polygon points="0,0 50,50 100,0" fill="blue" />
 <polygon points="100,0 50,50 100,100" fill="green" />
 <polygon points="0,100 50,50 100,100" fill="purple" />
+</g></g>
+<g transform="translate(700, 200)"><g>
+<polygon points="0,0 50,50 0,100" fill="red" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(0, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="red" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="cyan" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(100, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="magenta" />
+<polygon points="100,0 50,50 100,100" fill="magenta" />
+<polygon points="0,100 50,50 100,100" fill="gray" />
+</g></g>
+<g transform="translate(200, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="gray" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="yellow" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(300, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="lime" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="magenta" />
+</g></g>
+<g transform="translate(400, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="gray" />
+<polygon points="0,0 50,50 100,0" fill="yellow" />
+<polygon points="100,0 50,50 100,100" fill="cyan" />
+<polygon points="0,100 50,50 100,100" fill="magenta" />
+</g></g>
+<g transform="translate(500, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="blue" />
+<polygon points="100,0 50,50 100,100" fill="cyan" />
+<polygon points="0,100 50,50 100,100" fill="gray" />
+</g></g>
+<g transform="translate(600, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="magenta" />
+<polygon points="0,100 50,50 100,100" fill="lime" />
+</g></g>
+<g transform="translate(700, 300)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(0, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="gray" />
+<polygon points="0,0 50,50 100,0" fill="purple" />
+<polygon points="100,0 50,50 100,100" fill="red" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(100, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(200, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(300, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="cyan" />
+<polygon points="0,0 50,50 100,0" fill="orange" />
+<polygon points="100,0 50,50 100,100" fill="cyan" />
+<polygon points="0,100 50,50 100,100" fill="blue" />
+</g></g>
+<g transform="translate(400, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="cyan" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="cyan" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(500, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="lime" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="orange" />
+</g></g>
+<g transform="translate(600, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="yellow" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="blue" />
+</g></g>
+<g transform="translate(700, 400)"><g>
+<polygon points="0,0 50,50 0,100" fill="orange" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="gray" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(0, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(100, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="gray" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(200, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="orange" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="gray" />
+</g></g>
+<g transform="translate(300, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="orange" />
+<polygon points="0,0 50,50 100,0" fill="lime" />
+<polygon points="100,0 50,50 100,100" fill="yellow" />
+<polygon points="0,100 50,50 100,100" fill="orange" />
+</g></g>
+<g transform="translate(400, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="yellow" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="blue" />
+</g></g>
+<g transform="translate(500, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="purple" />
+</g></g>
+<g transform="translate(600, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="yellow" />
+<polygon points="100,0 50,50 100,100" fill="yellow" />
+<polygon points="0,100 50,50 100,100" fill="gray" />
+</g></g>
+<g transform="translate(700, 500)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="purple" />
+<polygon points="100,0 50,50 100,100" fill="red" />
+<polygon points="0,100 50,50 100,100" fill="blue" />
+</g></g>
+<g transform="translate(0, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="red" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(100, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="orange" />
+<polygon points="100,0 50,50 100,100" fill="yellow" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(200, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="gray" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="red" />
+<polygon points="0,100 50,50 100,100" fill="yellow" />
+</g></g>
+<g transform="translate(300, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="purple" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(400, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="red" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="orange" />
+</g></g>
+<g transform="translate(500, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="green" />
+<polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="yellow" />
+<polygon points="0,100 50,50 100,100" fill="lime" />
+</g></g>
+<g transform="translate(600, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="yellow" />
+<polygon points="0,0 50,50 100,0" fill="blue" />
+<polygon points="100,0 50,50 100,100" fill="green" />
+<polygon points="0,100 50,50 100,100" fill="gray" />
+</g></g>
+<g transform="translate(700, 600)"><g>
+<polygon points="0,0 50,50 0,100" fill="purple" />
+<polygon points="0,0 50,50 100,0" fill="blue" />
+<polygon points="100,0 50,50 100,100" fill="cyan" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(0, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="green" />
+<polygon points="100,0 50,50 100,100" fill="gray" />
+<polygon points="0,100 50,50 100,100" fill="red" />
+</g></g>
+<g transform="translate(100, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="lime" />
+<polygon points="0,0 50,50 100,0" fill="purple" />
+<polygon points="100,0 50,50 100,100" fill="orange" />
+<polygon points="0,100 50,50 100,100" fill="orange" />
+</g></g>
+<g transform="translate(200, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="orange" />
+<polygon points="100,0 50,50 100,100" fill="lime" />
+<polygon points="0,100 50,50 100,100" fill="purple" />
+</g></g>
+<g transform="translate(300, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="gray" />
+<polygon points="0,100 50,50 100,100" fill="yellow" />
+</g></g>
+<g transform="translate(400, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="yellow" />
+<polygon points="0,0 50,50 100,0" fill="gray" />
+<polygon points="100,0 50,50 100,100" fill="red" />
+<polygon points="0,100 50,50 100,100" fill="lime" />
+</g></g>
+<g transform="translate(500, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="yellow" />
+<polygon points="0,0 50,50 100,0" fill="yellow" />
+<polygon points="100,0 50,50 100,100" fill="magenta" />
+<polygon points="0,100 50,50 100,100" fill="cyan" />
+</g></g>
+<g transform="translate(600, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="blue" />
+<polygon points="0,0 50,50 100,0" fill="cyan" />
+<polygon points="100,0 50,50 100,100" fill="blue" />
+<polygon points="0,100 50,50 100,100" fill="purple" />
+</g></g>
+<g transform="translate(700, 700)"><g>
+<polygon points="0,0 50,50 0,100" fill="red" />
+<polygon points="0,0 50,50 100,0" fill="purple" />
+<polygon points="100,0 50,50 100,100" fill="yellow" />
+<polygon points="0,100 50,50 100,100" fill="yellow" />
 </g></g></svg>
