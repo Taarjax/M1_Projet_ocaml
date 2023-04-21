@@ -9,15 +9,9 @@ type edge = int
 type piece = {top: edge; right: edge; bottom: edge; left: edge}
 type puzzle = piece option array array
 
-(* Dimensions du puzzle *) 
-
-(* Puzzle *)
-
 (* Liste des couleurs *)
 let colors = [1; 2 ; 3; 4; 5; 6; 7; 8; 9]
-
 let create_empty_puzzle n m = Array.make_matrix n m None
-
 
 (* Fonction pour afficher une pièce *)
 let print_piece (piece: piece) : unit =
@@ -80,9 +74,8 @@ let piece_fits (puzzle: puzzle) (piece: piece) (i: int) (j: int) : bool =
     piece_fits_top puzzle piece i j && piece_fits_left puzzle piece i j
 
 (* Fonction pour faire pivoter une pièce *)
-let rotate (piece: piece) : piece =
-  { top = piece.left; right = piece.top; bottom = piece.right; left = piece.bottom }
-
+(* let rotate (piece: piece) : piece =
+  { top = piece.left; right = piece.top; bottom = piece.right; left = piece.bottom } *)
 
 (* Fonction pour résoudre le puzzle en utilisant le backtracking *)
 let rec solve (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle option =
@@ -108,31 +101,6 @@ let rec solve (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle o
           | None -> try_remaining_pieces remaining_pieces
     in
     try_remaining_pieces pieces
-
-    (* Méthode de résolution un peu plus performante que solve *)
-  let rec solve_2 (puzzle: puzzle) (remaining_pieces: piece list) (i: int) (j: int) : puzzle option =
-    let n,m = Array.length puzzle, Array.length puzzle.(0) in
-    if i = n && j = 0 then Some puzzle
-    else
-      let next_i, next_j =
-        if j = m - 1 then i + 1, 0
-        else i, j + 1
-      in
-      let rec try_remaining_pieces = function
-        | [] -> None
-        | piece :: r_piece ->
-            if piece_fits puzzle piece i j then
-              begin
-                let updated_puzzle = Array.copy puzzle in
-                updated_puzzle.(i).(j) <- Some piece;
-                match solve_2 updated_puzzle (List.filter ((<>) piece) remaining_pieces) next_i next_j with
-                | Some _ as solved_puzzle -> solved_puzzle
-                | None -> try_remaining_pieces r_piece
-              end
-            else
-              try_remaining_pieces r_piece
-      in
-      try_remaining_pieces remaining_pieces
   
   (* Fonction pour séparer les pièces en coins, bords et pièces internes *)
   let separate_pieces (pieces: piece list) : (piece list) * (piece list) * (piece list) =
@@ -154,7 +122,6 @@ let rec solve (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle o
    let rec solve_all (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle option =
     let n,m = Array.length puzzle, Array.length puzzle.(0) in
     let corners, borders, inner = separate_pieces pieces in
-  
     let rec try_candidates (candidates: piece list) (next_i: int) (next_j: int) : puzzle option =
       match candidates with
       | [] -> None
@@ -218,9 +185,6 @@ let rec solve (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle o
   done;
   shuffled_puzzle  
 
-
-
-
 (* --------------------------AFFICHAGE-------------------------- *)
 
 (* Tableau de correspondance des couleurs *)
@@ -244,7 +208,6 @@ let piece_to_svg piece : string =
   let left = side_to_polygon "left" piece.bottom in
 
   Printf.sprintf "<g>\n%s\n%s\n%s\n%s\n</g>" top right bottom left
-
 
 (* Fonction pour générer le SVG d'un puzzle *)
 let pieces_to_svg puzzle filename : unit =
@@ -275,7 +238,6 @@ let pieces_to_svg puzzle filename : unit =
 (* Fonction pour afficher le SVG d'un puzzle *)
 let print_svg puzzle filename : unit =
   pieces_to_svg puzzle filename
-
 
   (*  --------------------------UTILS--------------------------  *)
 
@@ -332,67 +294,114 @@ let print_svg puzzle filename : unit =
   let create_directory_if_not_exists path =
     if not (Sys.file_exists path) then Unix.mkdir path 0o755
 
+      type config = {
+        p1_size: int * int;
+        p2_puzzle: string;
+        p3_sizes: (int * int) list;
+      }
+      
+
+      let input_lines filename =
+        let ic = open_in filename in
+        let rec read_lines acc =
+          try
+            let line = input_line ic in
+            read_lines (line :: acc)
+          with End_of_file ->
+            Stdlib.close_in ic;
+            List.rev acc
+        in
+        read_lines []
+      ;;
+
+      
+      let read_config filename =
+        if Sys.file_exists filename then
+          let config = ref {
+            p1_size = (0, 0);
+            p2_puzzle = "";
+            p3_sizes = [];
+          } in
+          let read_line line =
+            if String.length line > 0 && line.[0] != '#' then
+              let key, value = match String.split_on_char ':' line with k :: v :: _ -> String.trim k, String.trim v | _ -> "", "" in
+              match key with
+              | "p1_size" ->
+                let n, m = Scanf.sscanf value "%d, %d" (fun a b -> a, b) in
+                config := { !config with p1_size = (n, m) }
+              | "p2_puzzle" ->
+                config := { !config with p2_puzzle = value }
+              | "p3_sizes" ->
+                let sizes = String.split_on_char ';' value |> List.map (fun s -> Scanf.sscanf (String.trim s) "%d, %d" (fun a b -> a, b)) in
+                config := { !config with p3_sizes = sizes }
+              | _ -> ()
+          in
+          let lines = input_lines filename in
+          List.iter read_line lines;
+          Some !config
+        else
+          None
+      ;;
+      
+  
+
   (* Programme principal *)
-  let p1() =
-  Random.self_init ();
-  let n, m = 12, 12 in
-  let empty_puzzle = create_empty_puzzle n m in
+  let p1 n m =
+    Random.self_init ();
+    let empty_puzzle = create_empty_puzzle n m in
 
-  let dirname = "Puzzle_p1" in
-  create_directory_if_not_exists dirname;
+    let dirname = "Puzzle_p1" in
+    create_directory_if_not_exists dirname;
 
-  let max_attempts = 10 in
-  let rec find_solution attempt soluce shuffled_puzzle =
-    if attempt >= max_attempts then
-      None
-    else
-      let pieces = List.flatten (Array.to_list (Array.map Array.to_list shuffled_puzzle)) in
-      let pieces_filtered = List.filter_map Fun.id pieces in
-      let solution = solve_all empty_puzzle pieces_filtered 0 0 in
-      match solution with
-      | Some _ -> solution
-      | None ->
-        print_endline "Nouvelle solution générée";
-        let new_soluce = generate_solvable_puzzle n m empty_puzzle in
-        print_endline "SOLUTION DU PUZZLE";
-        print_puzzle new_soluce;
-        print_svg new_soluce (Filename.concat dirname "Solution_que_lalgo_doit_avoir.svg");
-        let new_shuffled_puzzle = shuffle_puzzle new_soluce in
-        print_endline "PUZZLE MELANGE";
-        print_puzzle new_shuffled_puzzle;
-        print_svg new_shuffled_puzzle (Filename.concat dirname "puzzle_melanger_a_resoudre.svg");
-        find_solution (attempt + 1) new_soluce new_shuffled_puzzle
-  in
+    let max_attempts = 10 in
+    let rec find_solution attempt soluce shuffled_puzzle =
+      if attempt >= max_attempts then
+        None
+      else
+        let pieces = List.flatten (Array.to_list (Array.map Array.to_list shuffled_puzzle)) in
+        let pieces_filtered = List.filter_map Fun.id pieces in
+        let solution = solve_all empty_puzzle pieces_filtered 0 0 in
+        match solution with
+        | Some _ -> solution
+        | None ->
+          print_endline "Nouvelle solution générée";
+          let new_soluce = generate_solvable_puzzle n m empty_puzzle in
+          print_endline "SOLUTION DU PUZZLE";
+          print_puzzle new_soluce;
+          print_svg new_soluce (Filename.concat dirname "Solution_que_lalgo_doit_avoir.svg");
+          let new_shuffled_puzzle = shuffle_puzzle new_soluce in
+          print_endline "PUZZLE MELANGE";
+          print_puzzle new_shuffled_puzzle;
+          print_svg new_shuffled_puzzle (Filename.concat dirname "puzzle_melanger_a_resoudre.svg");
+          find_solution (attempt + 1) new_soluce new_shuffled_puzzle
+    in
 
-  let soluce = generate_solvable_puzzle n m empty_puzzle in
-  print_endline "SOLUTION DU PUZZLE";
-  print_puzzle soluce;
-  print_svg soluce (Filename.concat dirname "Solution_que_lalgo_doit_avoir.svg");
+    let soluce = generate_solvable_puzzle n m empty_puzzle in
+    print_endline "SOLUTION DU PUZZLE";
+    print_puzzle soluce;
+    print_svg soluce (Filename.concat dirname "Solution_que_lalgo_doit_avoir.svg");
 
-  let shuffled_puzzle = shuffle_puzzle soluce in
-  print_endline "PUZZLE MELANGE";
-  print_puzzle shuffled_puzzle;
-  print_svg shuffled_puzzle (Filename.concat dirname "puzzle_melanger_a_resoudre.svg");
+    let shuffled_puzzle = shuffle_puzzle soluce in
+    print_endline "PUZZLE MELANGE";
+    print_puzzle shuffled_puzzle;
+    print_svg shuffled_puzzle (Filename.concat dirname "puzzle_melanger_a_resoudre.svg");
 
-  let start_time = Sys.time () in
-  let solution = find_solution 0 soluce shuffled_puzzle in
+    let start_time = Sys.time () in
+    let solution = find_solution 0 soluce shuffled_puzzle in
 
-  match solution with
-  | Some solved_puzzle ->
-    print_endline "PUZZLE RESOLU";
-    print_puzzle solved_puzzle;
-    print_svg solved_puzzle (Filename.concat dirname "puzzle_resolu.svg");
-    let end_time = Sys.time () in
-    let elapsed_time = end_time -. start_time in
-    Printf.printf "Temps d'exécution: %f secondes\n" elapsed_time;
-  | None -> print_endline "Pas de solution après toutes les tentatives"
-;;
+    match solution with
+    | Some solved_puzzle ->
+      print_endline "PUZZLE RESOLU";
+      print_puzzle solved_puzzle;
+      print_svg solved_puzzle (Filename.concat dirname "puzzle_resolu.svg");
+      let end_time = Sys.time () in
+      let elapsed_time = end_time -. start_time in
+      Printf.printf "Temps d'exécution: %f secondes\n" elapsed_time;
+    | None -> print_endline "Pas de solution après toutes les tentatives"
+  ;;
 
-
-
-
-  let p2() = 
-    let puzzle_115s = import_puzzle "puzzle8s.txt" in
+  let p2 puzzle_filename  = 
+    let puzzle_115s = import_puzzle puzzle_filename in
     print_endline "PUZZLE DEPUIS FICHIER";
     print_puzzle puzzle_115s;
     let n, m = Array.length puzzle_115s, Array.length puzzle_115s.(0) in
@@ -416,9 +425,8 @@ let print_svg puzzle filename : unit =
     | None ->
       print_endline "Puzzle importé non résolu. Réessayer...";;
 
-      let p3 () =
+      let p3 sizes  =
         Random.self_init ();
-        let sizes = [(2, 2); (3, 3); (4, 4); (5, 5); (6, 6); (7, 7); (8, 8); (9, 9); (10, 10); (11, 11); (12, 12)] in
         let results = ref [] in
         let remaining_puzzles = ref sizes in
         let dir_name = "Puzzle_p3" in
@@ -457,244 +465,37 @@ let print_svg puzzle filename : unit =
         let csv_data = ["taille"; "temps"] :: (List.map (fun ((n, m), time) -> [string_of_int n ^ "x" ^ string_of_int m; string_of_float time]) !results) in
         Csv.save "results.csv" csv_data ;;
 
-      
-
-    
-      
-      
-      
-
-
-
-
-  let main () =
-    p1()
-    (* p2() *)
-    (* p3();; *)
-
-  let () = main ()
-
-
-    (* let rec solve_with_rotate (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle option =
-    if i = n && j = 0 then Some puzzle
-    else
-      let next_i, next_j =
-        if j = m - 1 then i + 1, 0
-        else i, j + 1
-      in
-      let try_placing_piece (piece: piece) : puzzle option =
-        let rec try_piece_with_rotations rotations_left =
-          if rotations_left = 0 then None
-          else
-            let updated_piece = if rotations_left = 4 then piece else rotate piece in
-            if piece_fits puzzle updated_piece i j then
-              let updated_puzzle = Array.copy puzzle in
-              updated_puzzle.(i).(j) <- Some updated_piece;
-              match solve_with_rotate updated_puzzle (List.filter ((<>) piece) pieces) next_i next_j with
-              | Some _ as solved_puzzle -> solved_puzzle
-              | None -> try_piece_with_rotations (rotations_left - 1)
-            else
-              try_piece_with_rotations (rotations_left - 1)
-        in
-        try_piece_with_rotations 4
-      in
-      let rec try_remaining_pieces = function
-        | [] -> None
-        | p :: ps ->
-            match try_placing_piece p with
-            | Some _ as solved_puzzle -> solved_puzzle
-            | None -> try_remaining_pieces ps
-      in
-      try_remaining_pieces pieces *)
-
-
-
-
-(* Fonction mélange d'un puzzle qui tourne également les pieces *)
-(* let shuffle_puzzle (puzzle: puzzle) : puzzle =
-  let shuffled_puzzle = Array.copy puzzle in
-  for i = 0 to n - 1 do
-    for j = 0 to m - 1 do
-      let i' = Random.int n in
-      let j' = Random.int m in
-      let tmp = shuffled_puzzle.(i).(j) in
-      shuffled_puzzle.(i).(j) <- shuffled_puzzle.(i').(j');
-      shuffled_puzzle.(i').(j') <- tmp;
-      match shuffled_puzzle.(i).(j) with
-      | None -> ()
-      | Some p ->
-          let r = Random.int 4 in
-          let rotated_piece = ref p in
-          for _ = 1 to r do
-            rotated_piece := rotate !rotated_piece
-          done;
-          shuffled_puzzle.(i).(j) <- Some !rotated_piece
-    done
-  done;
-  shuffled_puzzle *)
-
-
-
-  (*
-  (* MRV = meme temps de résolution *)
-(* Fonction pour vérifier si le puzzle est résolu *)
-let is_solved puzzle =
-  Array.for_all (fun row ->
-    Array.for_all (fun cell -> cell <> None) row
-  ) puzzle
-
-(* Fonction pour obtenir les valeurs restantes pour une position spécifique *)
-let get_remaining_values puzzle pieces i j =
-  List.filter (fun piece -> piece_fits puzzle piece i j) pieces
-
-
-(* Fonction pour essayer de placer une pièce dans le puzzle *)
-let try_placing_piece puzzle piece i j =
-  if piece_fits puzzle piece i j then
-    let updated_puzzle = Array.copy puzzle in
-    updated_puzzle.(i).(j) <- Some piece;
-    Some updated_puzzle
-  else
-    None
-
-(* Fonction pour résoudre le puzzle en utilisant le backtracking et la heuristique MRV *)
-let rec solve_mrv puzzle pieces i j =
-  if i = n && j = 0 then Some puzzle
-  else
-    let next_i, next_j =
-      if j = m - 1 then i + 1, 0
-      else i, j + 1
-    in
-    let remaining_values = get_remaining_values puzzle pieces i j in
-    let rec try_remaining_values = function
-      | [] -> None
-      | piece :: remaining_pieces ->
-        match try_placing_piece puzzle piece i j with
-        | Some updated_puzzle ->
-          (match solve_mrv updated_puzzle (List.filter ((<>) piece) pieces) next_i next_j with
-          | Some _ as solved_puzzle -> solved_puzzle
-          | None -> try_remaining_values remaining_pieces)
-        | None -> try_remaining_values remaining_pieces
-    in
-    try_remaining_values remaining_values
-  
-
-
-(* FORWARD CHECKING = PAS PLUS PERFORMANT
-Fonction pour vérifier si le puzzle est résolu *)
-let is_solved puzzle =
-  Array.for_all (fun row ->
-    Array.for_all (fun cell -> cell <> None) row
-  ) puzzle
-
-(* Fonction pour obtenir les valeurs restantes pour une position spécifique *)
-let get_remaining_values puzzle pieces i j =
-  List.filter (fun piece -> piece_fits puzzle piece i j) pieces
-
-(* Fonction pour vérifier si les pièces restantes peuvent être placées dans les positions adjacentes *)
-let forward_checking puzzle pieces i j =
-  let positions = [(i - 1, j); (i + 1, j); (i, j - 1); (i, j + 1)] in
-  List.for_all (fun (x, y) ->
-    if x >= 0 && x < n && y >= 0 && y < m && puzzle.(x).(y) = None then
-      let remaining_values = get_remaining_values puzzle pieces x y in
-      remaining_values <> []
-    else
-      true
-  ) positions
-
-(* Fonction pour essayer de placer une pièce dans le puzzle *)
-let try_placing_piece puzzle piece i j =
-  if piece_fits puzzle piece i j then
-    let updated_puzzle = Array.copy puzzle in
-    updated_puzzle.(i).(j) <- Some piece;
-    Some updated_puzzle
-  else
-    None
-
-(* Fonction pour résoudre le puzzle en utilisant le backtracking et l'heuristique forward-checking *)
-let rec solve_forward_checking puzzle pieces i j =
-  if i = n && j = 0 then Some puzzle
-  else
-    let next_i, next_j =
-      if j = m - 1 then i + 1, 0
-      else i, j + 1
-    in
-    let remaining_values = get_remaining_values puzzle pieces i j in
-    let rec try_remaining_values = function
-      | [] -> None
-      | piece :: remaining_pieces ->
-        match try_placing_piece puzzle piece i j with
-        | Some updated_puzzle ->
-          if forward_checking updated_puzzle (List.filter ((<>) piece) pieces) i j then
-            match solve_forward_checking updated_puzzle (List.filter ((<>) piece) pieces) next_i next_j with
-            | Some _ as solved_puzzle -> solved_puzzle
-            | None -> try_remaining_values remaining_pieces
-          else
-            try_remaining_values remaining_pieces
-        | None -> try_remaining_values remaining_pieces
-    in
-    try_remaining_values remaining_values 
-
-
- (* LCV = environ 5 seconde plus long
-Fonction pour vérifier si le puzzle est résolu *)
-let is_solved puzzle =
-  Array.for_all (fun row ->
-    Array.for_all (fun cell -> cell <> None) row
-  ) puzzle
-
-(* Fonction pour obtenir les valeurs restantes pour une position spécifique *)
-let get_remaining_values puzzle pieces i j =
-  List.filter (fun piece -> piece_fits puzzle piece i j) pieces
-
-(* Fonction pour compter les contraintes imposées par une pièce *)
-let count_constraints puzzle pieces piece i j =
-  let positions = [(i - 1, j); (i + 1, j); (i, j - 1); (i, j + 1)] in
-  List.fold_left (fun count (x, y) ->
-    if x >= 0 && x < n && y >= 0 && y < m && puzzle.(x).(y) = None then
-      count + (List.length (get_remaining_values puzzle pieces x y))
-    else
-      count
-  ) 0 positions
-
-
-(* Fonction pour trier les pièces par contraintes imposées (LCV) *)
-let sort_by_lcv puzzle pieces i j =
-  List.sort (fun piece1 piece2 ->
-    compare (count_constraints puzzle pieces piece1 i j) (count_constraints puzzle pieces piece2 i j)
-  ) pieces
-
-(* Fonction pour essayer de placer une pièce dans le puzzle *)
-let try_placing_piece puzzle piece i j =
-  if piece_fits puzzle piece i j then
-    let updated_puzzle = Array.copy puzzle in
-    updated_puzzle.(i).(j) <- Some piece;
-    Some updated_puzzle
-  else
-    None
-
-(* Fonction pour résoudre le puzzle en utilisant le backtracking et l'heuristique LCV *)
-let rec solve_lcv puzzle pieces i j =
-  if i = n && j = 0 then Some puzzle
-  else
-    let next_i, next_j =
-      if j = m - 1 then i + 1, 0
-      else i, j + 1
-    in
-    let remaining_values = get_remaining_values puzzle pieces i j in
-    let sorted_remaining_values = sort_by_lcv puzzle remaining_values i j in
-    let rec try_remaining_values = function
-      | [] -> None
-      | piece :: remaining_pieces ->
-        match try_placing_piece puzzle piece i j with
-        | Some updated_puzzle ->
-          (match solve_lcv updated_puzzle (List.filter ((<>) piece) pieces) next_i next_j with
-          | Some _ as solved_puzzle -> solved_puzzle
-          | None -> try_remaining_values remaining_pieces)
-        | None -> try_remaining_values remaining_pieces
-    in
-    try_remaining_values sorted_remaining_values  
-   
-  
-  
-  *)
+        let rec main () =
+          match read_config "config.txt" with
+          | Some config ->
+            print_endline "Choisissez le programme à exécuter :";
+            print_endline "1. Programme 1";
+            print_endline "2. Programme 2";
+            print_endline "3. Programme 3";
+            print_endline "0. Quitter";
+            print_string "> ";
+            (match read_line () with
+             | "1" ->
+               let n, m = config.p1_size in
+               print_endline "Exécution du programme 1";
+               p1 n m;
+               main ()
+             | "2" ->
+               print_endline "Exécution du programme 2";
+               p2 config.p2_puzzle;
+               main ()
+             | "3" ->
+               print_endline "Exécution du programme 3";
+               p3 config.p3_sizes;
+               main ()
+             | "0" ->
+               print_endline "Programme fermé !";
+               exit 0
+             | _ ->
+               print_endline "Entrée invalide. Veuillez réessayer.";
+               main ())
+          | None ->
+            print_endline "Fichier de configuration introuvable. Veuillez créer un fichier config.txt avec les paramètres appropriés."
+        ;;
+        
+        let () = main () ;;
