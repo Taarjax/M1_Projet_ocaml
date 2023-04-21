@@ -1,8 +1,9 @@
+(*Projet d'algorithmie, Eternity II - 1 Etudiant *)
+(* Auteurs : Rémy Auloy *) 
 open Stdlib
 open Csv 
 open Sys
 open Unix
-
 
 (* Définition des types et constantes *)
 type edge = int
@@ -62,6 +63,21 @@ let generate_solvable_puzzle (n : int) (m : int) (puzzle : puzzle): puzzle =
   done;
   puzzle
 
+(* Fonction pour mélanger le puzzle *)
+let shuffle_puzzle (puzzle: puzzle) : puzzle =
+  let n,m = Array.length puzzle, Array.length puzzle.(0) in
+  let shuffled_puzzle = Array.copy puzzle in
+  for i = 0 to n - 1 do
+    for j = 0 to m - 1 do
+      let i' = Random.int n in
+      let j' = Random.int m in
+      let tmp = shuffled_puzzle.(i).(j) in
+      shuffled_puzzle.(i).(j) <- shuffled_puzzle.(i').(j');
+      shuffled_puzzle.(i').(j') <- tmp
+    done
+  done;
+shuffled_puzzle  
+
 
 (* Fonction pour vérifier si une pièce correspond en haut *)
 let piece_fits_top (puzzle: puzzle) (piece: piece) (i: int) (j: int) : bool =
@@ -83,6 +99,7 @@ let piece_fits_left (puzzle: puzzle) (piece: piece) (i: int) (j: int) : bool =
 let piece_fits (puzzle: puzzle) (piece: piece) (i: int) (j: int) : bool =
     piece_fits_top puzzle piece i j && piece_fits_left puzzle piece i j
 
+(* PREMIER ALGORITHME NAIF *)
 (* Fonction pour résoudre le puzzle en utilisant le backtracking *)
 let rec solve (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle option =
   let n,m = Array.length puzzle, Array.length puzzle.(0) in
@@ -108,6 +125,9 @@ let rec solve (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzzle o
     in
     try_remaining_pieces pieces
   
+
+
+(* ALGORITHME OPTIMISE *)
 (* Fonction pour séparer les pièces en coins, bords et pièces internes *)
 let separate_pieces (pieces: piece list) : (piece list) * (piece list) * (piece list) =
   let rec aux (coins, borders, inner) = function
@@ -176,21 +196,6 @@ let rec solve_all (puzzle: puzzle) (pieces: piece list) (i: int) (j: int) : puzz
   try_candidates candidates next_i next_j
   
 
-(* Fonction pour mélanger le puzzle *)
-let shuffle_puzzle (puzzle: puzzle) : puzzle =
-  let n,m = Array.length puzzle, Array.length puzzle.(0) in
-  let shuffled_puzzle = Array.copy puzzle in
-  for i = 0 to n - 1 do
-    for j = 0 to m - 1 do
-      let i' = Random.int n in
-      let j' = Random.int m in
-      let tmp = shuffled_puzzle.(i).(j) in
-      shuffled_puzzle.(i).(j) <- shuffled_puzzle.(i').(j');
-      shuffled_puzzle.(i').(j') <- tmp
-    done
-  done;
-shuffled_puzzle  
-
 (* --------------------------AFFICHAGE-------------------------- *)
 
 (* Fonction pour générer le SVG d'une pièce *)
@@ -242,9 +247,10 @@ let pieces_to_svg puzzle filename : unit =
 let print_svg puzzle filename : unit =
   pieces_to_svg puzzle filename
 
-  (*  --------------------------UTILS--------------------------  *)
 
-  (* Fonction pour importer un puzzle depuis un fichier texte *)
+(*  --------------------------UTILS--------------------------  *)
+
+(* Fonction pour importer un puzzle depuis un fichier texte *)
 let import_puzzle filename : puzzle =
   let lines = ref [] in
   let ic = open_in filename in
@@ -272,7 +278,7 @@ let import_puzzle filename : puzzle =
     ) lines) in
     puzzle
 
-  (* Fonction pour extraire les pièces d'un puzzle *)
+(* Fonction pour extraire les pièces d'un puzzle *)
 let get_pieces_from_puzzle (puzzle: puzzle) : piece list =
   Array.fold_left (fun acc row ->
     acc @ (Array.fold_left (fun acc_piece piece_option ->
@@ -282,6 +288,7 @@ let get_pieces_from_puzzle (puzzle: puzzle) : piece list =
     ) [] row)
   ) [] puzzle
 
+(* Fonction pour afficher les pièces d'un puzzle *)
 let print_pieces corners borders inner =
   let print_piece_list label pieces =
     print_endline label;
@@ -293,11 +300,11 @@ let print_pieces corners borders inner =
   print_piece_list "Borders:" borders;
   print_piece_list "Inner pieces:" inner;;
 
-
+(* Fonction pour créer un dossier s'il n'existe pas *)
 let create_directory_if_not_exists path =
   if not (Sys.file_exists path) then Unix.mkdir path 0o755
 
-
+(* Méthode pour lire les lignes d'un fichier*)
 let input_lines filename =
   let ic = open_in filename in
   let rec read_lines acc =
@@ -311,6 +318,7 @@ let input_lines filename =
   read_lines []
 ;;
 
+(* Fonction pour lire le fichier de configuration *)
 let read_config filename =
   if Sys.file_exists filename then
     let config = ref {
@@ -356,6 +364,7 @@ let p1 n m =
       let pieces = List.flatten (Array.to_list (Array.map Array.to_list shuffled_puzzle)) in
       let pieces_filtered = List.filter_map Fun.id pieces in
       let solution = solve_all empty_puzzle pieces_filtered 0 0 in
+      (* let solution = solve empty_puzzle pieces_filtered 0 0 in *)
       match solution with
       | Some _ -> solution
       | None ->
@@ -408,7 +417,9 @@ let p2 puzzle_filename =
   let start_time = Sys.time () in
 
   let pieces = get_pieces_from_puzzle puzzle_importe in
-  let solution = solve empty_puzzle pieces 0 0 in
+  let solution =  solve_all empty_puzzle pieces 0 0 in
+  (* let solution =  solve empty_puzzle pieces 0 0 in. *)
+
   
   match solution with
   | Some solved_puzzle ->
@@ -442,7 +453,7 @@ let p3 sizes  =
 
       let start_time = Sys.time () in
       let solution = solve_all empty_puzzle pieces_filtered 0 0 in
-
+      (* let solution = solve empty_puzzle pieces_filtered 0 0 in *)
       match solution with
       | Some solved_puzzle ->
         let end_time = Sys.time () in
@@ -467,9 +478,9 @@ let rec main () =
   match read_config "config.txt" with
   | Some config ->
     print_endline "Choisissez le programme à exécuter :";
-    print_endline "1. Programme 1";
-    print_endline "2. Programme 2";
-    print_endline "3. Programme 3";
+    print_endline "1. Programme 1 (Génération de puzzle aléatoire, mélange et résolution. Configurez la taille du puzzle dans config.txt)";
+    print_endline "2. Programme 2 (Résolution de puzzle importé depuis un fichier. Ajouter votre puzzle à importer dans /puzzle_importe et configurez le nom du fichier dans config.txt)";
+    print_endline "3. Programme 3 (Résolution de puzzle aléatoire de taille variable. Configurez la liste des tailles dans config.txt)";
     print_endline "0. Quitter";
     print_string "> ";
     (match read_line () with
