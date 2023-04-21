@@ -368,13 +368,14 @@ let p1 n m =
       match solution with
       | Some _ -> solution
       | None ->
+        print_endline "L'algorithme n'a pas trouvé de solution";
         print_endline "Nouvelle solution générée";
         let new_soluce = generate_solvable_puzzle n m empty_puzzle in
-        print_endline "SOLUTION DU PUZZLE";
+        print_endline "SOLUTION DU NOUVEAU PUZZLE";
         print_puzzle new_soluce;
         print_svg new_soluce (Filename.concat dirname "Solution_que_lalgo_doit_avoir.svg");
         let new_shuffled_puzzle = shuffle_puzzle new_soluce in
-        print_endline "PUZZLE MELANGE";
+        print_endline "NOUVEAU PUZZLE MELANGE";
         print_puzzle new_shuffled_puzzle;
         print_svg new_shuffled_puzzle (Filename.concat dirname "puzzle_melanger_a_resoudre.svg");
         find_solution (attempt + 1) new_soluce new_shuffled_puzzle
