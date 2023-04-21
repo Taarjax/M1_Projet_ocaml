@@ -11,7 +11,6 @@ $(EXEC): eternity.ml
 
 clean:
 	rm -f *.cmx *.cmi *.cmo $(EXEC)
-	rm -f Puzzle_p1/* Puzzle_p3/*
-
+	rm -f Puzzle_p1/* Puzzle_p2/* Puzzle_p3/* 
 
 .PHONY: all clean
